@@ -139,6 +139,7 @@ include_directories(
 add_executable(image_converter src/image_converter.cpp)
 add_executable(image_process src/image_process.cpp)
 add_executable(image_hough_tf src/image_hough_tf.cpp)
+add_executable(grandson src/grandson.cpp)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -171,6 +172,13 @@ target_link_libraries(
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
+
+target_link_libraries(
+  grandson
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+
 
 
 #############
