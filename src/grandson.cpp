@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include "std_msgs/Int64.h"
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -7,12 +8,23 @@
 
 static const std::string COLOR_OPENCV_WINDOW = "Color Image";
 static const std::string DEPTH_OPENCV_WINDOW = "Depth Image";
-
+ros::Subscriber status_sub;
 int offset = 50;
 int window_size_x = 20;
 int window_size_y = 100;
+int status = 0;
+unsigned short left_depth = 0;
+unsigned short center_depth = 0;
+unsigned short right_depth = 0;
 
-void Color_Image_Callback(const sensor_msgs::ImageConstPtr& msg)
+enum Status
+{
+	Stop,
+	Straight,
+	Turn
+};
+
+void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
     cv_bridge::CvImagePtr cv_color_ptr;
     cv::namedWindow(COLOR_OPENCV_WINDOW);
@@ -46,7 +58,7 @@ void Color_Image_Callback(const sensor_msgs::ImageConstPtr& msg)
     cv::waitKey(3);
 }
 
-unsigned short Depth_Calculation(cv_bridge::CvImagePtr cv_depth_ptr, int left_upper_x, int left_upper_y, int window_size_x, int window_size_y)
+unsigned short depth_calculation(cv_bridge::CvImagePtr cv_depth_ptr, int left_upper_x, int left_upper_y, int window_size_x, int window_size_y)
 {
     std::vector<unsigned short> depth_vector;
     int count = 0;
@@ -72,7 +84,7 @@ unsigned short Depth_Calculation(cv_bridge::CvImagePtr cv_depth_ptr, int left_up
     }
 }
 
-void Depth_Image_Callback(const sensor_msgs::ImageConstPtr& msg)
+void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
     cv_bridge::CvImagePtr cv_depth_ptr;
     
@@ -88,11 +100,11 @@ void Depth_Image_Callback(const sensor_msgs::ImageConstPtr& msg)
     }
     int rows = cv_depth_ptr->image.rows;
     int cols = cv_depth_ptr->image.cols;
-    
+
     // Print out the depth information
-    unsigned short left_depth = Depth_Calculation(cv_depth_ptr, offset, rows/2 - 50, window_size_x, window_size_y);
-    unsigned short center_depth = Depth_Calculation(cv_depth_ptr, (cols-window_size_x)/2, rows/2 - 50, window_size_x, window_size_y);
-    unsigned short right_depth = Depth_Calculation(cv_depth_ptr, cols-window_size_x-offset, rows/2 - 50, window_size_x, window_size_y);
+    left_depth = depth_calculation(cv_depth_ptr, offset, rows/2 - 50, window_size_x, window_size_y);
+    center_depth = depth_calculation(cv_depth_ptr, (cols-window_size_x)/2, rows/2 - 50, window_size_x, window_size_y);
+    right_depth = depth_calculation(cv_depth_ptr, cols-window_size_x-offset, rows/2 - 50, window_size_x, window_size_y);
     ROS_INFO("Left: %u, Center: %u, Right: %u", left_depth, center_depth, right_depth);
 
     // Update GUI Window
@@ -100,29 +112,97 @@ void Depth_Image_Callback(const sensor_msgs::ImageConstPtr& msg)
     cv::waitKey(3);
 }
 
+void status_callback(const std_msgs::Int64 &msg)
+{
+    if(msg.data == 1)
+    {
+        status = 1;
+    }
+    else
+    {
+        status = 0;
+    }
+}
 
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "image_converter");
     // ImageConverter ic;
     ros::NodeHandle n;
+    ros::Publisher motor_pub = n.advertise<std_msgs::Int64>("/motor", 1000);
+    ros::Publisher steer_pub = n.advertise<std_msgs::Int64>("/steer", 1000);
+    ros::Rate loop_rate(50);
     image_transport::ImageTransport it(n);
 
     // Create a color image subscriber
     image_transport::Subscriber color_image_sub;
 
     // Subscribe to color input video feed and publish output video feed
-    color_image_sub = it.subscribe("/camera/color/image_raw", 1, Color_Image_Callback);
+    color_image_sub = it.subscribe("/camera/color/image_raw", 1, color_image_callback);
 
     
     // Create a depth image subscriber
     image_transport::Subscriber depth_image_sub;
 
     // Subscribe to depth input video feed
-    depth_image_sub = it.subscribe("/camera/depth/image_rect_raw", 1, Depth_Image_Callback);
-
-
-
-    ros::spin();
+    depth_image_sub = it.subscribe("/camera/depth/image_rect_raw", 1, depth_image_callback);
+    
+    // Check the status
+    status_sub = n.subscribe("status",1000, status_callback);
+    while(ros::ok)
+    {
+        std_msgs::Int64 msg;
+        if(status == Turn)
+        {
+            msg.data = 6200;
+            motor_pub.publish(msg);
+            if(center_depth > 10000) // go back to Straight
+            {
+                status = Straight;
+            }
+        }
+        else if(status == Straight)
+        {
+            msg.data = 6200;
+            motor_pub.publish(msg);
+            if(center_depth < 3000 && center_depth != 0)
+            {
+                // Turn 
+                status = Turn;
+                if(right_depth-left_depth > 1000)
+                {
+                    // Turn right
+                    msg.data = 6500;
+                    steer_pub.publish(msg);
+                }
+                else if(left_depth-right_depth > 1000)
+                {
+                    // Turn left
+                    msg.data = 5500;
+                    steer_pub.publish(msg);
+                }
+            }
+            else if(right_depth-left_depth > 1000)
+            {
+                // Turn right a little bit
+                msg.data = 6200;
+                steer_pub.publish(msg);
+            }
+            else if(left_depth-right_depth > 1000)
+            {
+                // Turn left a little bit
+                msg.data = 5800;
+                steer_pub.publish(msg);
+            }
+        }
+        else
+        {
+            // Stop
+            msg.data = 6000;
+            motor_pub.publish(msg);
+        }
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
     return 0;
 }
