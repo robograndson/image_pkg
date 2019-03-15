@@ -178,24 +178,24 @@ int main(int argc, char** argv)
             if(center_depth < 3500 && center_depth != 0)
             {
                 // Turn 
-                if(right_depth > 1000 + left_depth)
-                {   
-                    msg.data = TurnRight;
-                    status_pub.publish(msg);
-                    status = TurnRight;
-                    // Turn right
-                    msg.data = 6800;
-                    steer_pub.publish(msg);
-                }
-                else if(left_depth > 1000 + right_depth)
-                {
-                    msg.data = TurnLeft;
-                    status_pub.publish(msg);
-                    status = TurnLeft;
-                    // Turn left
-                    msg.data = 5200;
-                    steer_pub.publish(msg);
-                }
+                // if(right_depth > 1000 + left_depth)
+                // {   
+                msg.data = TurnRight;
+                status_pub.publish(msg);
+                status = TurnRight;
+                // Turn right
+                msg.data = 6800;
+                steer_pub.publish(msg);
+                // 
+                // else if(left_depth > 1000 + right_depth)
+                // {
+                //     msg.data = TurnLeft;
+                //     status_pub.publish(msg);
+                //     status = TurnLeft;
+                //     // Turn left
+                //     msg.data = 5200;
+                //     steer_pub.publish(msg);
+                // }
             }
             else if(right_depth > 1000 + left_depth)
             {
