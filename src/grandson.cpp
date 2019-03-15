@@ -159,9 +159,9 @@ int main(int argc, char** argv)
         std_msgs::Int64 msg;
         if(status == TurnRight || status == TurnLeft)
         {
-            msg.data = 6200;
+            msg.data = 6250;
             motor_pub.publish(msg);
-            if(center_depth > 8000) // go back to Straight
+            if(center_depth > 7500) // go back to Straight
             {
                 msg.data = Straight;
                 status_pub.publish(msg);
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
         }
         else if(status == Straight)
         {
-            msg.data = 6300;
+            msg.data = 6350;
             motor_pub.publish(msg);
             prev_status = status;
             if(center_depth < 3500 && center_depth != 0)
