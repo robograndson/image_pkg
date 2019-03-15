@@ -17,13 +17,16 @@ int prev_status = -1;
 unsigned short left_depth = 0;
 unsigned short center_depth = 0;
 unsigned short right_depth = 0;
+ros::Publisher motor_pub, steer_pub, status_pub;
 
 enum Status
 {
     Stop = 0,
     Straight = 1,
-    TurnRight = 2,
-    TurnLeft = 3
+    Straight_Left = 2,
+    Straight_Right = 3,
+    Turn_Right = 4,
+    Turn_Left = 5
 };
 
 void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
@@ -32,12 +35,12 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
     cv::namedWindow(COLOR_OPENCV_WINDOW);
     try
     {
-            cv_color_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        cv_color_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception& e)
     {
-            ROS_ERROR("cv_bridge exception: %s", e.what());
-            return;
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+        return;
     }
 
     // Image processing
@@ -127,14 +130,120 @@ void status_callback(const std_msgs::Int64 &msg)
     }
 }
 
+void updateStatus()
+{
+    std_msgs::Int64 msg;
+    if(status == Turn_Right || status == Turn_Left)
+    {
+        if(center_depth > 7500) // go back to Straight
+        {
+            msg.data = Straight;
+            status_pub.publish(msg);
+            status = Straight;
+        }
+    }
+    else if(status == Straight || status == Straight_Left || status == Straight_Right)
+    {
+        if(center_depth < 3500 && center_depth != 0)
+        {
+            // Turn 
+            msg.data = Turn_Right;
+            status_pub.publish(msg);
+            status = Turn_Right;
+            // 
+            // else if(left_depth > 1000 + right_depth)
+            // {
+            //     msg.data = TurnLeft;
+            //     status_pub.publish(msg);
+            //     status = TurnLeft;
+            //     // Turn left
+            //     msg.data = 5200;
+            //     steer_pub.publish(msg);
+            // }
+        }
+        else if(right_depth > 800 + left_depth)
+        {
+            // Turn right a little bit
+            msg.data = Straight_Right;
+            status_pub.publish(msg);
+            status = Straight_Right;
+        }
+        else if(left_depth > 800 + right_depth)
+        {
+            // Turn left a little bit
+            msg.data = Straight_Left;
+            status_pub.publish(msg);
+            status = Straight_Left;
+        }
+        else
+        {
+            msg.data = Straight;
+            status_pub.publish(msg);
+            status = Straight;
+        }
+    }
+    else
+    {
+        msg.data = Stop;
+        status_pub.publish(msg);
+        status = Stop;
+    }
+}
+
+void updateAction()
+{
+    std_msgs::Int64 msg;
+    if (status == Stop)
+    {
+        msg.data = 6000;
+        motor_pub.publish(msg);
+        steer_pub.publish(msg);
+    }
+    else if (status == Straight)
+    {
+        msg.data = 6375;
+        motor_pub.publish(msg);
+        msg.data = 6000;
+        steer_pub.publish(msg);
+    }
+    else if (status == Straight_Left)
+    {
+        msg.data = 6375;
+        motor_pub.publish(msg);
+        msg.data = 5850;
+        steer_pub.publish(msg);
+    }
+    else if (status == Straight_Right)
+    {
+        msg.data = 6375;
+        motor_pub.publish(msg);
+        msg.data = 6150;
+        steer_pub.publish(msg);
+    }
+    else if (status == Turn_Left)
+    {
+        msg.data = 6350;
+        motor_pub.publish(msg);
+        msg.data = 5200;
+        steer_pub.publish(msg);
+    }
+    else if (status == Turn_Right)
+    {
+        msg.data = 6350;
+        motor_pub.publish(msg);
+        msg.data = 6800;
+        steer_pub.publish(msg);
+    }
+}
+
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "image_converter");
     // ImageConverter ic;
     ros::NodeHandle n;
-    ros::Publisher motor_pub = n.advertise<std_msgs::Int64>("/motor", 100);
-    ros::Publisher steer_pub = n.advertise<std_msgs::Int64>("/steer", 100);
-    ros::Publisher status_pub = n.advertise<std_msgs::Int64>("/status", 100);
+    motor_pub = n.advertise<std_msgs::Int64>("/motor", 100);
+    steer_pub = n.advertise<std_msgs::Int64>("/steer", 100);
+    status_pub = n.advertise<std_msgs::Int64>("/status", 100);
     ros::Rate loop_rate(30);
     image_transport::ImageTransport it(n);
 
@@ -155,73 +264,13 @@ int main(int argc, char** argv)
     status_sub = n.subscribe("status",1000, status_callback);
 
     while(ros::ok())
-    {
-        std_msgs::Int64 msg;
-        if(status == TurnRight || status == TurnLeft)
-        {
-            msg.data = 6350;
-            motor_pub.publish(msg);
-            if(center_depth > 7500) // go back to Straight
-            {
-                msg.data = Straight;
-                status_pub.publish(msg);
-                status = Straight;
-                msg.data = 6000;
-                steer_pub.publish(msg);
-            }
-        }
-        else if(status == Straight)
-        {
-            msg.data = 6375;
-            motor_pub.publish(msg);
-            prev_status = status;
-            if(center_depth < 3500 && center_depth != 0)
-            {
-                // Turn 
-                // if(right_depth > 1000 + left_depth)
-                // {   
-                msg.data = TurnRight;
-                status_pub.publish(msg);
-                status = TurnRight;
-                // Turn right
-                msg.data = 6800;
-                steer_pub.publish(msg);
-                // 
-                // else if(left_depth > 1000 + right_depth)
-                // {
-                //     msg.data = TurnLeft;
-                //     status_pub.publish(msg);
-                //     status = TurnLeft;
-                //     // Turn left
-                //     msg.data = 5200;
-                //     steer_pub.publish(msg);
-                // }
-            }
-            else if(right_depth > 800 + left_depth)
-            {
-                // Turn right a little bit
-                msg.data = 6150;
-                steer_pub.publish(msg);
-            }
-            else if(left_depth > 800 + right_depth)
-            {
-                // Turn left a little bit
-                msg.data = 5850;
-                steer_pub.publish(msg);
-            }
-            else
-            {
-                msg.data = 6000;
-                steer_pub.publish(msg);
-            }
-        }
-        else
-        {
-            // Stop
-            msg.data = 6000;
-            motor_pub.publish(msg);
-            prev_status = status;
-        }
+    {   
+        // update status
+        updateStatus();
+
+        // update action
+        updateAction();
+        
         ros::spinOnce();
         loop_rate.sleep();
     }
