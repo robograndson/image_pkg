@@ -20,9 +20,10 @@ unsigned short right_depth = 0;
 
 enum Status
 {
-Stop,
-Straight,
-Turn
+    Stop = 0,
+    Straight = 1,
+    TurnRight = 2,
+    TurnLeft = 3
 };
 
 void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
@@ -156,15 +157,17 @@ int main(int argc, char** argv)
     while(ros::ok())
     {
         std_msgs::Int64 msg;
-        if(status == Turn)
+        if(status == TurnRight || status == TurnLeft)
         {
-            msg.data = 6200;
+            msg.data = 6500;
             motor_pub.publish(msg);
             if(center_depth > 8000) // go back to Straight
             {
                 msg.data = Straight;
                 status_pub.publish(msg);
                 status = Straight;
+                msg.data = 6000;
+                steer_pub.publish(msg);
             }
         }
         else if(status == Straight)
@@ -177,35 +180,35 @@ int main(int argc, char** argv)
                 // Turn 
                 if(right_depth > 1000 + left_depth)
                 {   
-                    msg.data = Turn;
+                    msg.data = TurnRight;
                     status_pub.publish(msg);
-                    status = Turn;
+                    status = TurnRight;
                     // Turn right
-                    msg.data = 6500;
+                    msg.data = 6800;
                     steer_pub.publish(msg);
                 }
                 else if(left_depth > 1000 + right_depth)
                 {
-                    msg.data = Turn;
+                    msg.data = TurnLeft;
                     status_pub.publish(msg);
-                    status = Turn;
+                    status = TurnLeft;
                     // Turn left
-                    msg.data = 5500;
+                    msg.data = 5200;
                     steer_pub.publish(msg);
                 }
             }
-            // else if(right_depth > 1000 + left_depth)
-            // {
-            //     // Turn right a little bit
-            //     msg.data = 6200;
-            //     steer_pub.publish(msg);
-            // }
-            // else if(left_depth > 1000 + right_depth)
-            // {
-            //     // Turn left a little bit
-            //     msg.data = 5800;
-            //     steer_pub.publish(msg);
-            // }
+            else if(right_depth > 1000 + left_depth)
+            {
+                // Turn right a little bit
+                msg.data = 6300;
+                steer_pub.publish(msg);
+            }
+            else if(left_depth > 1000 + right_depth)
+            {
+                // Turn left a little bit
+                msg.data = 5700;
+                steer_pub.publish(msg);
+            }
         }
         else
         {
