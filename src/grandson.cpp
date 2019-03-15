@@ -149,6 +149,7 @@ void updateStatus()
             // Turn 
             msg.data = Turn_Right;
             status_pub.publish(msg);
+
             status = Turn_Right;
             // 
             // else if(left_depth > 1000 + right_depth)
@@ -210,14 +211,14 @@ void updateAction()
     {
         msg.data = 6375;
         motor_pub.publish(msg);
-        msg.data = 5850;
+        msg.data = 5800;
         steer_pub.publish(msg);
     }
     else if (status == Straight_Right)
     {
         msg.data = 6375;
         motor_pub.publish(msg);
-        msg.data = 6150;
+        msg.data = 6200;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Left)
