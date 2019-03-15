@@ -159,7 +159,7 @@ int main(int argc, char** argv)
         std_msgs::Int64 msg;
         if(status == TurnRight || status == TurnLeft)
         {
-            msg.data = 6250;
+            msg.data = 6300;
             motor_pub.publish(msg);
             if(center_depth > 7500) // go back to Straight
             {
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
         }
         else if(status == Straight)
         {
-            msg.data = 6350;
+            msg.data = 6400;
             motor_pub.publish(msg);
             prev_status = status;
             if(center_depth < 3500 && center_depth != 0)
@@ -200,13 +200,13 @@ int main(int argc, char** argv)
             else if(right_depth > 1000 + left_depth)
             {
                 // Turn right a little bit
-                msg.data = 6300;
+                msg.data = 6150;
                 steer_pub.publish(msg);
             }
             else if(left_depth > 1000 + right_depth)
             {
                 // Turn left a little bit
-                msg.data = 5700;
+                msg.data = 5850;
                 steer_pub.publish(msg);
             }
         }
