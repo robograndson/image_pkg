@@ -209,6 +209,11 @@ int main(int argc, char** argv)
                 msg.data = 5850;
                 steer_pub.publish(msg);
             }
+            else
+            {
+                msg.data = 6000;
+                steer_pub.publish(msg);
+            }
         }
         else
         {
