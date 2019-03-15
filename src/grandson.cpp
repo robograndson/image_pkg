@@ -20,9 +20,9 @@ unsigned short right_depth = 0;
 
 enum Status
 {
-	Stop,
-	Straight,
-	Turn
+Stop,
+Straight,
+Turn
 };
 
 void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
@@ -31,12 +31,12 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
     cv::namedWindow(COLOR_OPENCV_WINDOW);
     try
     {
-        cv_color_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+            cv_color_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception& e)
     {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
+            ROS_ERROR("cv_bridge exception: %s", e.what());
+            return;
     }
 
     // Image processing
@@ -71,9 +71,9 @@ unsigned short depth_calculation(cv_bridge::CvImagePtr cv_depth_ptr, int left_up
             unsigned short depth = cv_depth_ptr->image.at<unsigned short>(i, j);
             if(depth != 0)
             {
-                count++;
-                //depth_vector.push_back(depth);
-	            sum += depth;
+                    count++;
+                    //depth_vector.push_back(depth);
+                sum += depth;
             }
         }
     }
@@ -117,13 +117,12 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
 
 void status_callback(const std_msgs::Int64 &msg)
 {
-    if(msg.data == 1)
-    {
-        status = 1;
+    if(msg.data == 0){
+        status = Stop;
     }
     else
     {
-        status = 0;
+        status = msg.data;
     }
 }
 
@@ -134,6 +133,7 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
     ros::Publisher motor_pub = n.advertise<std_msgs::Int64>("/motor", 100);
     ros::Publisher steer_pub = n.advertise<std_msgs::Int64>("/steer", 100);
+    ros::Publisher status_pub = n.advertise<std_msgs::Int64>("/status", 100);
     ros::Rate loop_rate(40);
     image_transport::ImageTransport it(n);
 
@@ -152,6 +152,7 @@ int main(int argc, char** argv)
     
     // Check the status
     status_sub = n.subscribe("status",1000, status_callback);
+
     while(ros::ok())
     {
         std_msgs::Int64 msg;
@@ -161,8 +162,10 @@ int main(int argc, char** argv)
             {
                 msg.data = 6200;
                 motor_pub.publish(msg);
-                if(center_depth > 10000) // go back to Straight
+                if(center_depth > 8000) // go back to Straight
                 {
+                    msg.data = Straight;
+                    status_pub.publish(msg);
                     status = Straight;
                 }
                 prev_status = status;
@@ -176,35 +179,40 @@ int main(int argc, char** argv)
                 motor_pub.publish(msg);
                 prev_status = status;
             }
-            if(center_depth < 3000 && center_depth != 0)
+            if(center_depth < 3500 && center_depth != 0)
             {
                 // Turn 
-                status = Turn;
-                if(right_depth-left_depth > 1000)
-                {
+                if(right_depth > 1000 + left_depth)
+                {   
+                    msg.data = Turn;
+                    status_pub.publish(msg);
+                    status = Turn;
                     // Turn right
-                    msg.data = 6400;
+                    msg.data = 6500;
                     steer_pub.publish(msg);
                 }
-                else if(left_depth-right_depth > 1000)
+                else if(left_depth > 1000 + right_depth)
                 {
+                    msg.data = Turn;
+                    status_pub.publish(msg);
+                    status = Turn;
                     // Turn left
-                    msg.data = 5600;
+                    msg.data = 5500;
                     steer_pub.publish(msg);
                 }
             }
-            else if(right_depth-left_depth > 1000)
-            {
-                // Turn right a little bit
-                msg.data = 6200;
-                steer_pub.publish(msg);
-            }
-            else if(left_depth-right_depth > 1000)
-            {
-                // Turn left a little bit
-                msg.data = 5800;
-                steer_pub.publish(msg);
-            }
+            // else if(right_depth > 1000 + left_depth)
+            // {
+            //     // Turn right a little bit
+            //     msg.data = 6200;
+            //     steer_pub.publish(msg);
+            // }
+            // else if(left_depth > 1000 + right_depth)
+            // {
+            //     // Turn left a little bit
+            //     msg.data = 5800;
+            //     steer_pub.publish(msg);
+            // }
         }
         else
         {
