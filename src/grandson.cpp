@@ -134,7 +134,7 @@ int main(int argc, char** argv)
     ros::Publisher motor_pub = n.advertise<std_msgs::Int64>("/motor", 100);
     ros::Publisher steer_pub = n.advertise<std_msgs::Int64>("/steer", 100);
     ros::Publisher status_pub = n.advertise<std_msgs::Int64>("/status", 100);
-    ros::Rate loop_rate(40);
+    ros::Rate loop_rate(30);
     image_transport::ImageTransport it(n);
 
     // Create a color image subscriber
@@ -158,27 +158,20 @@ int main(int argc, char** argv)
         std_msgs::Int64 msg;
         if(status == Turn)
         {
-            if (prev_status != status)
+            msg.data = 6200;
+            motor_pub.publish(msg);
+            if(center_depth > 8000) // go back to Straight
             {
-                msg.data = 6200;
-                motor_pub.publish(msg);
-                if(center_depth > 8000) // go back to Straight
-                {
-                    msg.data = Straight;
-                    status_pub.publish(msg);
-                    status = Straight;
-                }
-                prev_status = status;
+                msg.data = Straight;
+                status_pub.publish(msg);
+                status = Straight;
             }
         }
         else if(status == Straight)
         {
-            if (prev_status != status)
-            {
-                msg.data = 6200;
-                motor_pub.publish(msg);
-                prev_status = status;
-            }
+            msg.data = 6200;
+            motor_pub.publish(msg);
+            prev_status = status;
             if(center_depth < 3500 && center_depth != 0)
             {
                 // Turn 
@@ -217,12 +210,9 @@ int main(int argc, char** argv)
         else
         {
             // Stop
-            if (prev_status != status)
-            {
-                msg.data = 6000;
-                motor_pub.publish(msg);
-                prev_status = status;
-            }
+            msg.data = 6000;
+            motor_pub.publish(msg);
+            prev_status = status;
         }
         ros::spinOnce();
         loop_rate.sleep();
