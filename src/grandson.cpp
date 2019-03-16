@@ -141,16 +141,32 @@ void updateStatus()
             status_pub.publish(msg);
             status = Straight;
         }
+
+        if (status == Turn_Right && right_depth < 1000)
+        {
+            msg.data = Straight_Left;
+            status_pub.publish(msg);
+            status = Straight_Left;
+        }
+        // else if (status == Turn_Left && left_depth < 1000)
+        // {
+        //     msg.data = Straight_Right;
+        //     status_pub.publish(msg);
+        //     status = Straight_Right;
+        // }
     }
     else if(status == Straight || status == Straight_Left || status == Straight_Right)
     {
         if(center_depth < 3500 && center_depth != 0)
         {
-            // Turn 
-            msg.data = Turn_Right;
-            status_pub.publish(msg);
-
-            status = Turn_Right;
+            // Turn Right with enough space
+            if (right_depth > 1000)
+            {
+                msg.data = Turn_Right;
+                status_pub.publish(msg);
+                status = Turn_Right;
+            }
+            
             // 
             // else if(left_depth > 1000 + right_depth)
             // {
