@@ -142,7 +142,7 @@ void updateStatus()
             status = Straight;
         }
 
-        if (status == Turn_Right && right_depth < 1000)
+        if (status == Turn_Right && right_depth < 1500)
         {
             msg.data = Straight_Left;
             status_pub.publish(msg);
@@ -160,7 +160,7 @@ void updateStatus()
         if(center_depth < 3500 && center_depth != 0)
         {
             // Turn Right with enough space
-            if (right_depth > 1000)
+            if (right_depth > 1500)
             {
                 msg.data = Turn_Right;
                 status_pub.publish(msg);
