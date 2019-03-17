@@ -222,10 +222,6 @@ void updateAction()
         {
             msg.data = 6500;
         }
-        else if (center_depth > 6000)
-        {
-            msg.data = 6400;
-        }
         else
         {
             msg.data = 6350;
@@ -240,10 +236,6 @@ void updateAction()
         {
             msg.data = 6450;
         }
-        else if (center_depth > 6000)
-        {
-            msg.data = 6400;
-        }
         else
         {
             msg.data = 6350;
@@ -257,10 +249,6 @@ void updateAction()
         if (center_depth > 10000)
         {
             msg.data = 6450;
-        }
-        else if (center_depth > 6000)
-        {
-            msg.data = 6400;
         }
         else
         {
