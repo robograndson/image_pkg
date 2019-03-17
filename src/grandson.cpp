@@ -218,35 +218,68 @@ void updateAction()
     }
     else if (status == Straight)
     {
-        msg.data = 6375;
+        if (center_depth > 10000)
+        {
+            msg.data = 6500;
+        }
+        else if (center_depth > 6000)
+        {
+            msg.data = 6400;
+        }
+        else
+        {
+            msg.data = 6350;
+        }
         motor_pub.publish(msg);
         msg.data = 6000;
         steer_pub.publish(msg);
     }
     else if (status == Straight_Left)
     {
-        msg.data = 6375;
+        if (center_depth > 10000)
+        {
+            msg.data = 6450;
+        }
+        else if (center_depth > 6000)
+        {
+            msg.data = 6400;
+        }
+        else
+        {
+            msg.data = 6350;
+        }
         motor_pub.publish(msg);
         msg.data = 5800;
         steer_pub.publish(msg);
     }
     else if (status == Straight_Right)
     {
-        msg.data = 6375;
+        if (center_depth > 10000)
+        {
+            msg.data = 6450;
+        }
+        else if (center_depth > 6000)
+        {
+            msg.data = 6400;
+        }
+        else
+        {
+            msg.data = 6350;
+        }
         motor_pub.publish(msg);
         msg.data = 6200;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Left)
     {
-        msg.data = 6350;
+        msg.data = 6325;
         motor_pub.publish(msg);
         msg.data = 5200;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Right)
     {
-        msg.data = 6350;
+        msg.data = 6325;
         motor_pub.publish(msg);
         msg.data = 6800;
         steer_pub.publish(msg);
