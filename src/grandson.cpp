@@ -135,7 +135,7 @@ void updateStatus()
     std_msgs::Int64 msg;
     if(status == Turn_Right/* || status == Turn_Left*/)
     {
-        if(center_depth > 7500) // go back to Straight
+        if(center_depth > 7000) // go back to Straight
         {
             msg.data = Straight_Left;
             status_pub.publish(msg);
@@ -218,9 +218,9 @@ void updateAction()
     }
     else if (status == Straight)
     {
-        if (center_depth > 9000)
+        if (center_depth > 10000)
         {
-            msg.data = 6550;
+            msg.data = 6560;
         }
         else
         {
@@ -232,30 +232,30 @@ void updateAction()
     }
     else if (status == Straight_Left)
     {
-        if (center_depth > 9000)
+        if (center_depth > 10000)
         {
-            msg.data = 6500;
+            msg.data = 6510;
         }
         else
         {
             msg.data = 6375;
         }
         motor_pub.publish(msg);
-        msg.data = 5790;
+        msg.data = 5800;
         steer_pub.publish(msg);
     }
     else if (status == Straight_Right)
     {
-        if (center_depth > 9000)
+        if (center_depth > 10000)
         {
-            msg.data = 6500;
+            msg.data = 6510;
         }
         else
         {
             msg.data = 6375;
         }
         motor_pub.publish(msg);
-        msg.data = 6210;
+        msg.data = 6200;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Left)
