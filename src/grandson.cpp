@@ -220,7 +220,7 @@ void updateAction()
     {
         if (center_depth > 10000)
         {
-            msg.data = 6500;
+            msg.data = 6600;
         }
         else
         {
@@ -234,40 +234,40 @@ void updateAction()
     {
         if (center_depth > 10000)
         {
-            msg.data = 6450;
+            msg.data = 6600;
         }
         else
         {
             msg.data = 6350;
         }
         motor_pub.publish(msg);
-        msg.data = 5800;
+        msg.data = 5750;
         steer_pub.publish(msg);
     }
     else if (status == Straight_Right)
     {
         if (center_depth > 10000)
         {
-            msg.data = 6450;
+            msg.data = 6600;
         }
         else
         {
             msg.data = 6350;
         }
         motor_pub.publish(msg);
-        msg.data = 6200;
+        msg.data = 6250;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Left)
     {
-        msg.data = 6325;
+        msg.data = 6500;
         motor_pub.publish(msg);
         msg.data = 5200;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Right)
     {
-        msg.data = 6325;
+        msg.data = 6500;
         motor_pub.publish(msg);
         msg.data = 6800;
         steer_pub.publish(msg);
