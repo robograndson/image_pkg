@@ -218,13 +218,13 @@ void updateAction()
     }
     else if (status == Straight)
     {
-        if (center_depth > 10000)
+        if (center_depth > 9000)
         {
             msg.data = 6550;
         }
         else
         {
-            msg.data = 6350;
+            msg.data = 6375;
         }
         motor_pub.publish(msg);
         msg.data = 6000;
@@ -232,30 +232,30 @@ void updateAction()
     }
     else if (status == Straight_Left)
     {
-        if (center_depth > 10000)
+        if (center_depth > 9000)
         {
             msg.data = 6500;
         }
         else
         {
-            msg.data = 6350;
+            msg.data = 6375;
         }
         motor_pub.publish(msg);
-        msg.data = 5800;
+        msg.data = 5790;
         steer_pub.publish(msg);
     }
     else if (status == Straight_Right)
     {
-        if (center_depth > 10000)
+        if (center_depth > 9000)
         {
             msg.data = 6500;
         }
         else
         {
-            msg.data = 6350;
+            msg.data = 6375;
         }
         motor_pub.publish(msg);
-        msg.data = 6200;
+        msg.data = 6210;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Left)
