@@ -133,13 +133,13 @@ void status_callback(const std_msgs::Int64 &msg)
 void updateStatus()
 {
     std_msgs::Int64 msg;
-    if(status == Turn_Right || status == Turn_Left)
+    if(status == Turn_Right/* || status == Turn_Left*/)
     {
         if(center_depth > 7500) // go back to Straight
         {
-            msg.data = Straight;
+            msg.data = Straight_Left;
             status_pub.publish(msg);
-            status = Straight;
+            status = Straight_Left;
         }
 
         if (status == Turn_Right && right_depth < 1500)
@@ -241,7 +241,7 @@ void updateAction()
             msg.data = 6350;
         }
         motor_pub.publish(msg);
-        msg.data = 5750;
+        msg.data = 5800;
         steer_pub.publish(msg);
     }
     else if (status == Straight_Right)
@@ -255,7 +255,7 @@ void updateAction()
             msg.data = 6350;
         }
         motor_pub.publish(msg);
-        msg.data = 6250;
+        msg.data = 6200;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Left)
