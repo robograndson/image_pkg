@@ -220,11 +220,11 @@ void updateAction()
     {
         if (center_depth > 10000)
         {
-            msg.data = 6600;
+            msg.data = 6650;
         }
         else
         {
-            msg.data = 6375;
+            msg.data = 6400;
         }
         motor_pub.publish(msg);
         msg.data = 6000;
@@ -234,11 +234,11 @@ void updateAction()
     {
         if (center_depth > 10000)
         {
-            msg.data = 6550;
+            msg.data = 6575;
         }
         else
         {
-            msg.data = 6385;
+            msg.data = 6390;
         }
         motor_pub.publish(msg);
         msg.data = 5800;
@@ -248,11 +248,11 @@ void updateAction()
     {
         if (center_depth > 10000)
         {
-            msg.data = 6550;
+            msg.data = 6575;
         }
         else
         {
-            msg.data = 6385;
+            msg.data = 6390;
         }
         motor_pub.publish(msg);
         msg.data = 6200;
