@@ -14,6 +14,7 @@ int window_size_x = 9;
 int window_size_y = 9;
 int status = 0;
 int prev_status = -1;
+ros::Time start;
 unsigned short left_depth = 0;
 unsigned short center_depth = 0;
 unsigned short right_depth = 0;
@@ -37,7 +38,7 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
     {
         cv_color_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
-    catch (cv_bridge::Exception& e)
+   catch (cv_bridge::Exception& e)
     {
         ROS_ERROR("cv_bridge exception: %s", e.what());
         return;
@@ -135,7 +136,7 @@ void updateStatus()
     std_msgs::Int64 msg;
     if(status == Turn_Right/* || status == Turn_Left*/)
     {
-        if(center_depth > 7000) // go back to Straight
+        if(center_depth > 6800) // go back to Straight
         {
             msg.data = Straight_Left;
             status_pub.publish(msg);
@@ -157,10 +158,14 @@ void updateStatus()
     }
     else if(status == Straight || status == Straight_Left || status == Straight_Right)
     {
-        if(center_depth < 4000 && center_depth != 0)
+        if (prev_status == Stop)
+        {
+            start = ros::Time::now();
+        }
+        if(center_depth < 3900 && center_depth != 0)
         {
             // Turn Right with enough space
-            if (right_depth > 1500)
+            if (right_depth > 1800)
             {
                 msg.data = Turn_Right;
                 status_pub.publish(msg);
@@ -205,6 +210,7 @@ void updateStatus()
         status_pub.publish(msg);
         status = Stop;
     }
+    prev_status = status;
 }
 
 void updateAction()
@@ -218,13 +224,13 @@ void updateAction()
     }
     else if (status == Straight)
     {
-        if (center_depth > 10500)
+        if (center_depth > 11000)
         {
-            msg.data = 6700;
+            msg.data = 6650;
         }
-        else
+        else if ((ros::Time::now() - start).toSec() < 23)
         {
-            msg.data = 6400;
+            msg.data = 6350;
         }
         motor_pub.publish(msg);
         msg.data = 6000;
@@ -232,13 +238,13 @@ void updateAction()
     }
     else if (status == Straight_Left)
     {
-        if (center_depth > 10500)
+        if (center_depth > 11000)
         {
             msg.data = 6600;
         }
-        else
+        else if ((ros::Time::now() - start).toSec() < 23)
         {
-            msg.data = 6400;
+            msg.data = 6350;
         }
         motor_pub.publish(msg);
         msg.data = 5800;
@@ -246,13 +252,13 @@ void updateAction()
     }
     else if (status == Straight_Right)
     {
-        if (center_depth > 10500)
+        if (center_depth > 11000)
         {
             msg.data = 6600;
         }
-        else
+        else if ((ros::Time::now() - start).toSec() < 23)
         {
-            msg.data = 6400;
+            msg.data = 6350;
         }
         motor_pub.publish(msg);
         msg.data = 6200;
@@ -260,14 +266,14 @@ void updateAction()
     }
     else if (status == Turn_Left)
     {
-        msg.data = 6425;
+        msg.data = 6300;
         motor_pub.publish(msg);
         msg.data = 5200;
         steer_pub.publish(msg);
     }
     else if (status == Turn_Right)
     {
-        msg.data = 6425;
+        msg.data = 6300;
         motor_pub.publish(msg);
         msg.data = 6800;
         steer_pub.publish(msg);
