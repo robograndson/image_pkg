@@ -244,7 +244,7 @@ void updateAction()
         {
             msg.data = 6450;
         }
-        else if ((ros::Time::now() - start).toSec() < 23)
+        else
         {
             msg.data = 6350;
         }
@@ -258,7 +258,7 @@ void updateAction()
         {
             msg.data = 6450;
         }
-        else if ((ros::Time::now() - start).toSec() < 23)
+        else
         {
             msg.data = 6350;
         }
@@ -272,7 +272,7 @@ void updateAction()
         {
             msg.data = 6450;
         }
-        else if ((ros::Time::now() - start).toSec() < 23)
+        else
         {
             msg.data = 6350;
         }
