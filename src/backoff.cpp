@@ -296,7 +296,7 @@ void updateAction()
     }
     else if (status == Back)
     {
-        msg.data = 5800;
+        msg.data = 5500;
         motor_pub.publish(msg);
         msg.data = 6000;
         steer_pub.publish(msg);
