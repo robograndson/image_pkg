@@ -159,7 +159,13 @@ void updateStatus()
     }
     else if(status == Straight || status == Straight_Left || status == Straight_Right)
     {
-        if(center_depth < 3900 && center_depth != 0)
+        if(center_depth < 500 && right_depth < 2000 && left_depth < 2000)
+        {
+            msg.data = Back;
+            status_pub.publish(msg);
+            status = Back;
+        }
+        else if(center_depth < 3900 && center_depth != 0)
         {
             // Turn Right with enough space
             if (right_depth > 1800)
@@ -179,12 +185,6 @@ void updateStatus()
             //     msg.data = 5200;
             //     steer_pub.publish(msg);
             // }
-        }
-        else if(center_depth < 500 && right_depth < 2000 && left_depth < 2000)
-        {
-            msg.data = Back;
-            status_pub.publish(msg);
-            status = Back;
         }
         else if(right_depth > 800 + left_depth)
         {
@@ -209,7 +209,7 @@ void updateStatus()
     }
     else if (status == Back)
     {
-        if (center_depth > 2000)
+        if (center_depth > 1700)
         {
             msg.data = Straight;
             status_pub.publish(msg);
