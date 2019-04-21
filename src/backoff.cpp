@@ -159,10 +159,6 @@ void updateStatus()
     }
     else if(status == Straight || status == Straight_Left || status == Straight_Right)
     {
-        if (prev_status == Stop)
-        {
-            start = ros::Time::now();
-        }
         if(center_depth < 3900 && center_depth != 0)
         {
             // Turn Right with enough space
@@ -296,7 +292,7 @@ void updateAction()
     }
     else if (status == Back)
     {
-        msg.data = 5500;
+        msg.data = 5700;
         motor_pub.publish(msg);
         msg.data = 6000;
         steer_pub.publish(msg);
