@@ -209,7 +209,7 @@ void updateStatus()
     }
     else if (status == Back)
     {
-        if (center_depth > 1700)
+        if (center_depth > 1850)
         {
             msg.data = Straight;
             status_pub.publish(msg);
