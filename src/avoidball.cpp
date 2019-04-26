@@ -17,6 +17,7 @@ int prev_status = -1;
 ros::Time start;
 unsigned short left_depth = 0;
 unsigned short center_depth = 0;
+unsigned short wider_center_depth = 0;
 unsigned short right_depth = 0;
 ros::Publisher motor_pub, steer_pub, status_pub;
 
@@ -133,7 +134,8 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
 
     // Print out the depth information
     left_depth = depth_calculation(cv_depth_ptr, offset, rows/2 - 30, window_size_x, window_size_y);
-    center_depth = wider_depth_calculation(cv_depth_ptr, (cols-window_size_x)/2 - 30, rows/2 + 30, 60 + window_size_x, window_size_y);
+    wider_center_depth = wider_depth_calculation(cv_depth_ptr, (cols-window_size_x)/2 - 30, rows/2 + 30, 60 + window_size_x, window_size_y);
+    center_depth = depth_calculation(cv_depth_ptr, (cols-window_size_x)/2, rows/2 - 30, window_size_x, window_size_y);
     right_depth = depth_calculation(cv_depth_ptr, cols-window_size_x-offset, rows/2 - 30, window_size_x, window_size_y);
     // ROS_INFO("Left: %u, Center: %u, Right: %u", left_depth, center_depth, right_depth);
 
@@ -204,6 +206,22 @@ void updateStatus()
             //     msg.data = 5200;
             //     steer_pub.publish(msg);
             // }
+        }
+        else if(wider_center_depth < 2000)
+        {
+            if(left_depth > right_depth)
+            {
+                // Turn right a little bit
+                msg.data = Straight_Left;
+                status_pub.publish(msg);
+                status = Straight_Left;
+            } 
+            else
+            {
+                msg.data = Straight_Right;
+                status_pub.publish(msg);
+                status = Straight_Right;
+            }
         }
         else if(right_depth > 800 + left_depth)
         {
