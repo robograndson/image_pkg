@@ -141,6 +141,7 @@ add_executable(image_process src/image_process.cpp)
 add_executable(image_hough_tf src/image_hough_tf.cpp)
 add_executable(grandson src/grandson.cpp)
 add_executable(backoff src/backoff.cpp)
+add_executable(stop_sign_detection src/stop_sign_detection.cpp)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -186,6 +187,11 @@ target_link_libraries(
   ${OpenCV_LIBRARIES}
 )
 
+target_link_libraries(
+  stop_sign_detection
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
 
 
 #############
