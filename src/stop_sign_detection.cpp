@@ -56,7 +56,7 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
 
     std::vector<cv::Vec3f> circles;
     // Apply the Hough Transform to find the circles
-    cv::HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 200, 100, 0, 0 );
+    cv::HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 120, 60, 0, 0 );
 
     // Draw the circles detected
     for( size_t i = 0; i < circles.size(); i++ )
