@@ -135,7 +135,7 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
     left_depth = depth_calculation(cv_depth_ptr, offset, rows/2 - 30, window_size_x, window_size_y);
     center_depth = wider_depth_calculation(cv_depth_ptr, (cols-window_size_x)/2 - 30, rows/2 + 30, 60 + window_size_x, window_size_y);
     right_depth = depth_calculation(cv_depth_ptr, cols-window_size_x-offset, rows/2 - 30, window_size_x, window_size_y);
-    ROS_INFO("Left: %u, Center: %u, Right: %u", left_depth, center_depth, right_depth);
+    // ROS_INFO("Left: %u, Center: %u, Right: %u", left_depth, center_depth, right_depth);
 
     // Update GUI Window
     //cv::imshow(DEPTH_OPENCV_WINDOW, cv_depth_ptr->image);
@@ -314,10 +314,10 @@ int main(int argc, char** argv)
     image_transport::ImageTransport it(n);
 
     // Create a color image subscriber
-    image_transport::Subscriber color_image_sub;
+    // image_transport::Subscriber color_image_sub;
 
     // Subscribe to color input video feed and publish output video feed
-    color_image_sub = it.subscribe("/camera/color/image_raw", 1, color_image_callback);
+    // color_image_sub = it.subscribe("/camera/color/image_raw", 1, color_image_callback);
 
     
     // Create a depth image subscriber
