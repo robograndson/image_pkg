@@ -36,7 +36,7 @@ enum Status
 void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
     cv_bridge::CvImagePtr cv_color_ptr;
-    cv::namedWindow(COLOR_OPENCV_WINDOW);
+    // cv::namedWindow(COLOR_OPENCV_WINDOW);
     try
     {
         cv_color_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -73,11 +73,13 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
     //  }
      if (circles.size() > 0 && !stop_flag)
      {
-         stop_sign = true;
+        stop_flag = true;
+        stop_sign = true;
+        stop_start = ros::Time::now();
      }
      else
      {
-         stop_sign = false;
+        stop_sign = false;
      }
 
     // Update GUI Window
@@ -157,18 +159,22 @@ void updateStatus()
     std_msgs::Int64 msg;
     if(stop_sign)
     {
-        stop_start = ros::Time::now();
-        if ((ros::Time::now() - stop_start).toSec() < 3)
+        // ROS_INFO("stop!!!");
+        for (int i = 0;i<20;i++)
         {
             msg.data = Stop;
             status_pub.publish(msg);
             status = Stop; 
         }
-        else
+        ros::Duration(3).sleep();
+        for (int i = 0;i<20;i++)
         {
-            stop_flag = true;
+            msg.data = Straight;
+            status_pub.publish(msg);
+            status = Straight;
         }
     }
+
     if(status == Turn_Right/* || status == Turn_Left*/)
     {
         if(center_depth > 6800) // go back to Straight
@@ -261,7 +267,7 @@ void updateAction()
     {
         if (center_depth > 11000)
         {
-            msg.data = 6650;
+            msg.data = 6450;
         }
         else if ((ros::Time::now() - start).toSec() < 23)
         {
@@ -275,7 +281,7 @@ void updateAction()
     {
         if (center_depth > 11000)
         {
-            msg.data = 6600;
+            msg.data = 6450;
         }
         else if ((ros::Time::now() - start).toSec() < 23)
         {
@@ -289,7 +295,7 @@ void updateAction()
     {
         if (center_depth > 11000)
         {
-            msg.data = 6600;
+            msg.data = 6450;
         }
         else if ((ros::Time::now() - start).toSec() < 23)
         {
