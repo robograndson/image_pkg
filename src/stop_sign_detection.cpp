@@ -15,9 +15,12 @@ int window_size_y = 9;
 int status = 0;
 int prev_status = -1;
 ros::Time start;
+ros::Time stop_start;
 unsigned short left_depth = 0;
 unsigned short center_depth = 0;
 unsigned short right_depth = 0;
+bool stop_sign = false;
+bool stop_flag = false;
 ros::Publisher motor_pub, steer_pub, status_pub;
 
 enum Status
@@ -27,7 +30,7 @@ enum Status
     Straight_Left = 2,
     Straight_Right = 3,
     Turn_Right = 4,
-    Turn_Left = 5
+    Turn_Left = 5,
 };
 
 void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
@@ -59,20 +62,27 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
     cv::HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 120, 60, 0, 0 );
 
     // Draw the circles detected
-    for( size_t i = 0; i < circles.size(); i++ )
-    {
-        cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-        int radius = cvRound(circles[i][2]);
-        // circle center
-        cv::circle( src, center, 3, cv::Scalar(0,255,0), -1, 8, 0 );
-        // circle outline
-        cv::circle( src, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
+    // for( size_t i = 0; i < circles.size(); i++ )
+    // {
+    //     cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+    //     int radius = cvRound(circles[i][2]);
+    //     // circle center
+    //     cv::circle( src, center, 3, cv::Scalar(0,255,0), -1, 8, 0 );
+    //     // circle outline
+    //     cv::circle( src, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
+    //  }
+     if (circles.size() > 0 && !stop_flag)
+     {
+         stop_sign = true;
+     }
+     else
+     {
+         stop_sign = false;
      }
 
-
     // Update GUI Window
-    cv::imshow(COLOR_OPENCV_WINDOW, src);
-    cv::waitKey(3);
+    // cv::imshow(COLOR_OPENCV_WINDOW, src);
+    // cv::waitKey(3);
 }
 
 unsigned short depth_calculation(cv_bridge::CvImagePtr cv_depth_ptr, int left_upper_x, int left_upper_y, int window_size_x, int window_size_y)
@@ -145,6 +155,20 @@ void status_callback(const std_msgs::Int64 &msg)
 void updateStatus()
 {
     std_msgs::Int64 msg;
+    if(stop_sign)
+    {
+        stop_start = ros::Time::now();
+        if ((ros::Time::now() - stop_start).toSec() < 3)
+        {
+            msg.data = Stop;
+            status_pub.publish(msg);
+            status = Stop; 
+        }
+        else
+        {
+            stop_flag = true;
+        }
+    }
     if(status == Turn_Right/* || status == Turn_Left*/)
     {
         if(center_depth > 6800) // go back to Straight
