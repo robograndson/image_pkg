@@ -248,7 +248,7 @@ void updateAction()
     {
         if (center_depth > 11000)
         {
-            msg.data = 6650;
+            msg.data = 6450;
         }
         else if ((ros::Time::now() - start).toSec() < 23)
         {
@@ -262,7 +262,7 @@ void updateAction()
     {
         if (center_depth > 11000)
         {
-            msg.data = 6600;
+            msg.data = 6450;
         }
         else if ((ros::Time::now() - start).toSec() < 23)
         {
@@ -276,7 +276,7 @@ void updateAction()
     {
         if (center_depth > 11000)
         {
-            msg.data = 6600;
+            msg.data = 6450;
         }
         else if ((ros::Time::now() - start).toSec() < 23)
         {
