@@ -158,20 +158,45 @@ void status_callback(const std_msgs::Int64 &msg)
 void updateStatus()
 {
     std_msgs::Int64 msg;
-    if(status == Turn_Right/* || status == Turn_Left*/)
-    {
-        if(center_depth > 6800) // go back to Straight
+    if(status == Turn_Right || status == Turn_Left)
+    {   
+        if (status == Turn_Right)
         {
-            msg.data = Straight_Left;
-            status_pub.publish(msg);
-            status = Straight_Left;
+            if(center_depth > 6800) // go back to Straight
+            {
+                msg.data = Straight_Left;
+                status_pub.publish(msg);
+                status = Straight_Left;
+            }
+            if (right_depth < 1500)
+            {
+                msg.data = Straight_Left;
+                status_pub.publish(msg);
+                status = Straight_Left;
+            }
         }
 
-        if (status == Turn_Right && right_depth < 1500)
+        if (status == Turn_Left)
         {
-            msg.data = Straight_Left;
+            if(center_depth > 6800) // go back to Straight
+            {
+                msg.data = Straight_Right;
+                status_pub.publish(msg);
+                status = Straight_Right;
+            }
+            if (right_depth < 1500)
+            {
+                msg.data = Straight_Left;
+                status_pub.publish(msg);
+                status = Straight_Left;
+            }
+        }
+       
+        if (status == Turn_Left && left_depth < 1500)
+        {
+            msg.data = Straight_Right;
             status_pub.publish(msg);
-            status = Straight_Left;
+            status = Straight_Right;
         }
         // else if (status == Turn_Left && left_depth < 1000)
         // {
