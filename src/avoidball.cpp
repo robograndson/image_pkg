@@ -119,7 +119,7 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
     cv_bridge::CvImagePtr cv_depth_ptr;
     
-    cv::namedWindow(DEPTH_OPENCV_WINDOW);
+    // cv::namedWindow(DEPTH_OPENCV_WINDOW);
     try
     {
         cv_depth_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::TYPE_16UC1);//now cv_ptr is the matrix, do not forget "TYPE_" before "16UC1"
@@ -140,7 +140,7 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
     // ROS_INFO("Left: %u, Center: %u, Right: %u, Wider Center: %u", left_depth, center_depth, right_depth, wider_center_depth);
 
     // Update GUI Window
-    cv::imshow(DEPTH_OPENCV_WINDOW, cv_depth_ptr->image);
+    // cv::imshow(DEPTH_OPENCV_WINDOW, cv_depth_ptr->image);
     //cv::waitKey(3);
 }
 
