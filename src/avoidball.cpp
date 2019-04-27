@@ -34,7 +34,7 @@ enum Status
 void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
     cv_bridge::CvImagePtr cv_color_ptr;
-    cv::namedWindow(COLOR_OPENCV_WINDOW);
+    // cv::namedWindow(COLOR_OPENCV_WINDOW);
     try
     {
         cv_color_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -61,7 +61,7 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
     cv::Point pt6(cols-window_size_x-offset + window_size_x, rows/2 - 30 + window_size_y);
     cv::rectangle(cv_color_ptr->image, pt5, pt6, cv::Scalar(255, 0, 0), 3);
     // Update GUI Window
-    cv::imshow(COLOR_OPENCV_WINDOW, cv_color_ptr->image);
+    // cv::imshow(COLOR_OPENCV_WINDOW, cv_color_ptr->image);
     cv::waitKey(3);
 }
 
