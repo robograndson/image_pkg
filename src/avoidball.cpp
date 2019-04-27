@@ -53,8 +53,8 @@ void color_image_callback(const sensor_msgs::ImageConstPtr& msg)
     cv::Point pt2(offset + window_size_x, rows/2 - 30 + window_size_y);
     cv::rectangle(cv_color_ptr->image, pt1, pt2, cv::Scalar(255, 0, 0), 3);
 
-    cv::Point pt3((cols-window_size_x)/2 - 30, rows/2 + 30);
-    cv::Point pt4((cols-window_size_x)/2 + window_size_x + 30, rows/2 + 30 + window_size_y);
+    cv::Point pt3((cols-window_size_x)/2 - 30, rows/2 + 50);
+    cv::Point pt4((cols-window_size_x)/2 + window_size_x + 30, rows/2 + 50 + window_size_y);
     cv::rectangle(cv_color_ptr->image, pt3, pt4, cv::Scalar(255, 0, 0), 3);
 
     cv::Point pt5(cols-window_size_x-offset, rows/2 - 30);
@@ -119,7 +119,7 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
     cv_bridge::CvImagePtr cv_depth_ptr;
     
-    //cv::namedWindow(DEPTH_OPENCV_WINDOW);
+    cv::namedWindow(DEPTH_OPENCV_WINDOW);
     try
     {
         cv_depth_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::TYPE_16UC1);//now cv_ptr is the matrix, do not forget "TYPE_" before "16UC1"
@@ -134,13 +134,13 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
 
     // Print out the depth information
     left_depth = depth_calculation(cv_depth_ptr, offset, rows/2 - 30, window_size_x, window_size_y);
-    wider_center_depth = wider_depth_calculation(cv_depth_ptr, (cols-window_size_x)/2 - 30, rows/2 + 30, 60 + window_size_x, window_size_y);
+    wider_center_depth = wider_depth_calculation(cv_depth_ptr, (cols-window_size_x)/2 - 30, rows/2 + 50, 60 + window_size_x, window_size_y);
     center_depth = depth_calculation(cv_depth_ptr, (cols-window_size_x)/2, rows/2 - 30, window_size_x, window_size_y);
     right_depth = depth_calculation(cv_depth_ptr, cols-window_size_x-offset, rows/2 - 30, window_size_x, window_size_y);
-    // ROS_INFO("Left: %u, Center: %u, Right: %u", left_depth, center_depth, right_depth);
+    ROS_INFO("Left: %u, Center: %u, Right: %u, Wider Center: %u", left_depth, center_depth, right_depth, wider_center_depth);
 
     // Update GUI Window
-    //cv::imshow(DEPTH_OPENCV_WINDOW, cv_depth_ptr->image);
+    cv::imshow(DEPTH_OPENCV_WINDOW, cv_depth_ptr->image);
     //cv::waitKey(3);
 }
 
