@@ -77,8 +77,8 @@ unsigned short depth_calculation(cv_bridge::CvImagePtr cv_depth_ptr, int left_up
             unsigned short depth = cv_depth_ptr->image.at<unsigned short>(i, j);
             if(depth != 0)
             {
-                    count++;
-                    //depth_vector.push_back(depth);
+                count++;
+                //depth_vector.push_back(depth);
                 sum += depth;
             }
         }
@@ -207,20 +207,20 @@ void updateStatus()
             //     steer_pub.publish(msg);
             // }
         }
-        else if(wider_center_depth < 2000)
+        else if(wider_center_depth < 3000)
         {
             if(left_depth > right_depth)
             {
                 // Turn right a little bit
-                msg.data = Straight_Left;
+                msg.data = Turn_Left;
                 status_pub.publish(msg);
-                status = Straight_Left;
+                status = Turn_Left;
             } 
             else
             {
-                msg.data = Straight_Right;
+                msg.data = Turn_Right;
                 status_pub.publish(msg);
-                status = Straight_Right;
+                status = Turn_Right;
             }
         }
         else if(right_depth > 800 + left_depth)
