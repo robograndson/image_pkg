@@ -137,7 +137,7 @@ void depth_image_callback(const sensor_msgs::ImageConstPtr& msg)
     wider_center_depth = wider_depth_calculation(cv_depth_ptr, (cols-window_size_x)/2 - 30, rows/2 + 50, 60 + window_size_x, window_size_y);
     center_depth = depth_calculation(cv_depth_ptr, (cols-window_size_x)/2, rows/2 - 30, window_size_x, window_size_y);
     right_depth = depth_calculation(cv_depth_ptr, cols-window_size_x-offset, rows/2 - 30, window_size_x, window_size_y);
-    ROS_INFO("Left: %u, Center: %u, Right: %u, Wider Center: %u", left_depth, center_depth, right_depth, wider_center_depth);
+    // ROS_INFO("Left: %u, Center: %u, Right: %u, Wider Center: %u", left_depth, center_depth, right_depth, wider_center_depth);
 
     // Update GUI Window
     cv::imshow(DEPTH_OPENCV_WINDOW, cv_depth_ptr->image);
