@@ -234,19 +234,24 @@ void updateStatus()
         }
         else if(wider_center_depth < 3000)
         {
-            // if(left_depth > right_depth)
-            // {
-            //     // Turn right a little bit
-            //     msg.data = Turn_Left;
-            //     status_pub.publish(msg);
-            //     status = Turn_Left;
-            // } 
-            // else
-            // {
-            msg.data = Turn_Right;
-            status_pub.publish(msg);
-            status = Turn_Right;
-            // }
+            if(left_depth > right_depth)
+            {
+                msg.data = 5500;
+                steer_pub.publish(msg);
+                ros::Duration(1).sleep();
+                msg.data = 6500;
+                steer_pub.publish(msg);
+                ros::Duration(1).sleep();
+            } 
+            else
+            {
+                msg.data = 6500;
+                steer_pub.publish(msg);
+                ros::Duration(1).sleep();
+                msg.data = 5500;
+                steer_pub.publish(msg);
+                ros::Duration(1).sleep();
+            }
         }
         else if(right_depth > 800 + left_depth)
         {
