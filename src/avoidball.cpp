@@ -234,19 +234,19 @@ void updateStatus()
         }
         else if(wider_center_depth < 3000)
         {
-            if(left_depth > right_depth)
-            {
-                // Turn right a little bit
-                msg.data = Turn_Left;
-                status_pub.publish(msg);
-                status = Turn_Left;
-            } 
-            else
-            {
-                msg.data = Turn_Right;
-                status_pub.publish(msg);
-                status = Turn_Right;
-            }
+            // if(left_depth > right_depth)
+            // {
+            //     // Turn right a little bit
+            //     msg.data = Turn_Left;
+            //     status_pub.publish(msg);
+            //     status = Turn_Left;
+            // } 
+            // else
+            // {
+            msg.data = Turn_Right;
+            status_pub.publish(msg);
+            status = Turn_Right;
+            // }
         }
         else if(right_depth > 800 + left_depth)
         {
